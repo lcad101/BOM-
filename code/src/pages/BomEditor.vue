@@ -64,7 +64,7 @@ async function handleExport() {
     const result = await safeInvoke<ExportResult>('export_bom_to_excel', {
       bomVersionId: versionId, filePath: '', options: exportOptions.value,
     });
-    ElMessage.success(`导出成功，共 ${result.totalRows} 行`);
+    ElMessage.success(`导出成功，文件已保存到：${result.filePath}，共 ${result.totalRows} 行`);
     exportDialogVisible.value = false;
   } catch { /* safeInvoke handles errors */ }
 }
