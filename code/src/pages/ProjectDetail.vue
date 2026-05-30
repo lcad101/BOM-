@@ -73,6 +73,20 @@ async function handleRelease(versionId: string) {
     confirmButtonText: '确认发布',
   });
   await bomStore.releaseBomVersion(versionId);
+  await bomStore.loadBomVersions(projectId);
+}
+
+/** 删除BOM版本 */
+async function handleDeleteVersion(versionId: string, bomName: string) {
+  await ElMessageBox.confirm(`确定要删除BOM版本「${bomName}」吗？删除后不可恢复！`, '删除确认', {
+    type: 'warning',
+    confirmButtonText: '删除',
+    confirmButtonClass: 'el-button--danger',
+  });
+  const success = await bomStore.deleteBomVersion(versionId);
+  if (success) {
+    await bomStore.loadBomVersions(projectId);
+  }
 }
 
 /** 打开创建版本对话框 */
@@ -128,7 +142,7 @@ function openCreateVersionDialog() {
         <el-table-column label="创建时间" width="180">
           <template #default="{ row }">{{ formatDateTime(row.createdAt) }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="250" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link size="small" @click="openBomEditor(row.id)">
               <el-icon><Edit /></el-icon> 编辑
@@ -141,6 +155,14 @@ function openCreateVersionDialog() {
               @click="handleRelease(row.id)"
             >
               <el-icon><Promotion /></el-icon> 发布
+            </el-button>
+            <el-button
+              type="danger"
+              link
+              size="small"
+              @click="handleDeleteVersion(row.id, row.name)"
+            >
+              <el-icon><Delete /></el-icon> 删除
             </el-button>
           </template>
         </el-table-column>

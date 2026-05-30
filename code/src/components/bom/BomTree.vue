@@ -68,7 +68,12 @@ function closeContextMenu() { contextMenuVisible.value = false; contextMenuNode.
 function handleAddChild() { editParentNode.value = contextMenuNode.value; editMode.value = 'add-child'; editDialogVisible.value = true; closeContextMenu(); }
 function handleAddComponent() { editParentNode.value = contextMenuNode.value; editMode.value = 'add-component'; editDialogVisible.value = true; closeContextMenu(); }
 function handleEditNode() { editParentNode.value = contextMenuNode.value; editMode.value = 'edit'; editDialogVisible.value = true; closeContextMenu(); }
-async function handleDeleteNode() { if (!contextMenuNode.value) return; closeContextMenu(); await bomStore.deleteNode(contextMenuNode.value.id); }
+async function handleDeleteNode() { 
+  const nodeId = contextMenuNode.value?.id; 
+  if (!nodeId) return; 
+  closeContextMenu(); 
+  await bomStore.deleteNode(nodeId); 
+}
 function handleDialogConfirm() { editDialogVisible.value = false; }
 function handleAddRoot() { editParentNode.value = null; editMode.value = 'add-child'; editDialogVisible.value = true; }
 function isSelected(node: BomNode) { return bomStore.selectedNode?.id === node.id; }

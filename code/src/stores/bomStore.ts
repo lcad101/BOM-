@@ -77,6 +77,15 @@ export const useBomStore = defineStore('bom', () => {
     } catch (err) { error.value = err instanceof Error ? err.message : '发布BOM版本失败'; return false; }
   }
 
+  async function deleteBomVersion(versionId: string): Promise<boolean> {
+    try {
+      await safeInvoke('delete_bom_version', { versionId }, { successMessage: 'BOM版本已删除' });
+      bomVersions.value = bomVersions.value.filter((v) => v.id !== versionId);
+      if (currentVersion.value?.id === versionId) currentVersion.value = null;
+      return true;
+    } catch (err) { error.value = err instanceof Error ? err.message : '删除BOM版本失败'; return false; }
+  }
+
   async function loadBomTree(versionId: string, expandAll = false) {
     isTreeLoading.value = true; error.value = null;
     try {
@@ -164,7 +173,7 @@ export const useBomStore = defineStore('bom', () => {
   return {
     bomTree, bomVersions, currentVersion, selectedNode, expandedNodeIds, isLoading, isTreeLoading, error,
     isDraft, isReleased, canEdit, draftVersions, releasedVersions, totalNodeCount,
-    loadBomVersions, createBomVersion, getBomVersion, releaseBomVersion,
+    loadBomVersions, createBomVersion, getBomVersion, releaseBomVersion, deleteBomVersion,
     loadBomTree, addNode, updateNode, deleteNode, moveNode, compareVersions,
     selectNode, toggleNodeExpand, expandAllNodes, collapseAllNodes, setCurrentVersion,
   };

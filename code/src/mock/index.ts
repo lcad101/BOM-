@@ -37,6 +37,7 @@ const commands: Record<string, (...args: any[]) => any> = {
   export_bom_to_excel: cmdExportBom,
   trigger_backup: cmdTriggerBackup,
   restore_from_backup: cmdRestoreFromBackup,
+  delete_bom_version: cmdDeleteBomVersion,
 };
 
 export async function mockInvoke<T>(command: string, args?: Record<string, unknown>): Promise<T> {
@@ -478,6 +479,16 @@ function cmdAddAlternativePart(a: Record<string, unknown>): unknown {
 function cmdRemoveAlternativePart(a: Record<string, unknown>): void {
   const d = getData();
   d.alternativeParts = d.alternativeParts.filter((ap) => ap.id !== a.alternativeId);
+  flushData();
+}
+
+function cmdDeleteBomVersion(a: Record<string, unknown>): void {
+  const d = getData();
+  const versionId = a.versionId as string;
+  // 删除BOM版本
+  d.bomVersions = d.bomVersions.filter((v) => v.id !== versionId);
+  // 删除关联的BOM节点
+  d.bomNodes = d.bomNodes.filter((n) => n.bomVersionId !== versionId);
   flushData();
 }
 
