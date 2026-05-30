@@ -124,7 +124,7 @@ const selectedNodeDetail = computed(() => bomStore.selectedNode);
       <div class="toolbar-left">
         <el-button link @click="goBack"><el-icon><ArrowLeft /></el-icon></el-button>
         <div class="version-info" v-if="bomStore.currentVersion">
-          <h3>{{ bomStore.currentVersion.name }} {{ bomStore.currentVersion.versionNumber }}</h3>
+          <h3>{{ bomStore.currentVersion.bomCode }} {{ bomStore.currentVersion.name }} {{ bomStore.currentVersion.versionNumber }}</h3>
           <el-tag :type="bomStore.isDraft ? 'info' : 'success'" size="small">
             {{ formatVersionStatus(bomStore.currentVersion.status) }}
           </el-tag>

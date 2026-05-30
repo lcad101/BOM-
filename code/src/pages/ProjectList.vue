@@ -27,7 +27,7 @@ const createRules = {
   ],
   projectCode: [
     { required: true, message: '请输入项目编号', trigger: 'blur' },
-    { pattern: /^PRJ-\d{4}-\d{3}$/, message: '格式应为 PRJ-YYYY-NNN', trigger: 'blur' },
+    { pattern: /^P00\d{5}-\d{4}-\d{3}$/, message: '格式应为 P00XXXXX-YYYY-XXX', trigger: 'blur' },
   ],
   owner: [{ required: true, message: '请输入负责人', trigger: 'blur' }],
 };
@@ -206,7 +206,7 @@ function handleSearch() {
           <el-input v-model="createForm.name" placeholder="如：智能网关V2.0" />
         </el-form-item>
         <el-form-item label="项目编号" prop="projectCode">
-          <el-input v-model="createForm.projectCode" placeholder="如：PRJ-2026-001" />
+          <el-input v-model="createForm.projectCode" placeholder="如：P0000001-2026-001" />
         </el-form-item>
         <el-form-item label="负责人" prop="owner">
           <el-input v-model="createForm.owner" placeholder="请输入负责人姓名" />

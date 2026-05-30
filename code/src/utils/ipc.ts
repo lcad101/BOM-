@@ -50,7 +50,12 @@ export async function safeInvoke<T>(
     }
     return result as T;
   } catch (error) {
-    const message = typeof error === 'string' ? error : '操作失败，请稍后重试';
+    console.error('[IPC Error]', command, error);
+    const message = typeof error === 'string'
+      ? error
+      : error instanceof Error
+        ? error.message
+        : `操作失败: ${String(error)}`;
     if (!options?.silent) {
       ElMessage.error(message);
     }

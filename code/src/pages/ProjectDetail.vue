@@ -17,6 +17,7 @@ const projectId = route.params.projectId as string;
 // 创建BOM版本对话框
 const createVersionDialogVisible = ref(false);
 const versionForm = ref({
+  bomCode: '',
   name: '',
   versionNumber: 'v1.0',
   description: '',
@@ -25,6 +26,10 @@ const versionForm = ref({
 const versionFormRef = ref();
 
 const versionRules = {
+  bomCode: [
+    { required: true, message: '请输入BOM编号', trigger: 'blur' },
+    { pattern: /^\d{12}$/, message: 'BOM编号为12位数字', trigger: 'blur' },
+  ],
   name: [{ required: true, message: '请输入BOM名称', trigger: 'blur' }],
 };
 
@@ -41,6 +46,7 @@ async function handleCreateVersion() {
 
   const params: CreateBomVersionParams = {
     projectId,
+    bomCode: versionForm.value.bomCode,
     name: versionForm.value.name,
     versionNumber: versionForm.value.versionNumber,
     description: versionForm.value.description,
@@ -71,7 +77,7 @@ async function handleRelease(versionId: string) {
 
 /** 打开创建版本对话框 */
 function openCreateVersionDialog() {
-  versionForm.value = { name: '', versionNumber: 'v1.0', description: '', sourceVersionId: '' };
+  versionForm.value = { bomCode: '', name: '', versionNumber: 'v1.0', description: '', sourceVersionId: '' };
   createVersionDialogVisible.value = true;
 }
 </script>
@@ -105,6 +111,7 @@ function openCreateVersionDialog() {
         stripe
         style="width: 100%"
       >
+        <el-table-column prop="bomCode" label="BOM编号" min-width="140" />
         <el-table-column prop="name" label="BOM名称" min-width="150" />
         <el-table-column prop="versionNumber" label="版本号" width="100" />
         <el-table-column label="状态" width="100">
@@ -143,6 +150,9 @@ function openCreateVersionDialog() {
     <!-- 创建BOM版本对话框 -->
     <el-dialog v-model="createVersionDialogVisible" title="创建BOM版本" width="500px">
       <el-form ref="versionFormRef" :model="versionForm" :rules="versionRules" label-width="100px">
+        <el-form-item label="BOM编号" prop="bomCode">
+          <el-input v-model="versionForm.bomCode" placeholder="如：123456789012" />
+        </el-form-item>
         <el-form-item label="BOM名称" prop="name">
           <el-input v-model="versionForm.name" placeholder="如：主板BOM" />
         </el-form-item>
