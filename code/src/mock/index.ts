@@ -494,5 +494,7 @@ function cmdRestoreFromBackup(): { success: boolean; message: string } {
 function cmdExportBom(a: Record<string, unknown>): { filePath: string; totalRows: number; fileSize: number } {
   const d = getData();
   const nodes = d.bomNodes.filter((n) => n.bomVersionId === a.bomVersionId);
-  return { filePath: `bom_export_${a.bomVersionId}.xlsx`, totalRows: nodes.length, fileSize: nodes.length * 200 };
+  // 使用用户指定的路径，如果未指定则使用默认路径
+  const filePath = (a.filePath as string) || `bom_export_${a.bomVersionId}.xlsx`;
+  return { filePath, totalRows: nodes.length, fileSize: nodes.length * 200 };
 }

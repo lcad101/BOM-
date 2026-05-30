@@ -10,6 +10,15 @@ import { safeInvoke } from '@/utils/ipc';
 import type { BomNode } from '@/types/bom';
 import type { ExportResult } from '@/types/api';
 
+// 检测是否在Tauri环境中
+function isTauriEnvironment(): boolean {
+  try {
+    return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+  } catch {
+    return false;
+  }
+}
+
 const route = useRoute();
 const router = useRouter();
 const bomStore = useBomStore();
@@ -60,9 +69,35 @@ async function handleRelease() {
 /** 导出BOM */
 async function handleExport() {
   if (!bomStore.currentVersion) return;
+  
+  let filePath = '';
+  
+  // 如果在Tauri环境中，弹出文件保存对话框
+  if (isTauriEnvironment()) {
+    try {
+      const { save } = await import('@tauri-apps/plugin-dialog');
+      const defaultName = `${bomStore.currentVersion.name}_${bomStore.currentVersion.versionNumber}.xlsx`;
+      const selected = await save({
+        defaultPath: defaultName,
+        filters: [{
+          name: 'Excel文件',
+          extensions: ['xlsx']
+        }]
+      });
+      
+      // 用户取消了选择
+      if (!selected) return;
+      filePath = selected;
+    } catch (error) {
+      console.error('文件对话框错误:', error);
+      ElMessage.error('打开文件保存对话框失败');
+      return;
+    }
+  }
+  
   try {
     const result = await safeInvoke<ExportResult>('export_bom_to_excel', {
-      bomVersionId: versionId, filePath: '', options: exportOptions.value,
+      bomVersionId: versionId, filePath: filePath, options: exportOptions.value,
     });
     ElMessage.success(`导出成功，文件已保存到：${result.filePath}，共 ${result.totalRows} 行`);
     exportDialogVisible.value = false;
