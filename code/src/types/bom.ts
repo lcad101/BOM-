@@ -32,6 +32,7 @@ export type ChangeType = (typeof ChangeType)[keyof typeof ChangeType];
 export interface BomVersion {
   id: string;
   projectId: string;
+  bomCode: string;
   name: string;
   versionNumber: string;
   status: BomVersionStatus;
@@ -107,6 +108,7 @@ export interface MoveBomNodeParams {
 /** 创建BOM版本参数 */
 export interface CreateBomVersionParams {
   projectId: string;
+  bomCode: string;
   name: string;
   versionNumber?: string;
   description?: string;

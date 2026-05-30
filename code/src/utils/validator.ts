@@ -37,12 +37,12 @@ export function stringLength(
 }
 
 /**
- * 校验项目编号格式 (PRJ-YYYY-NNN)
+ * 校验项目编号格式 (P00XXXXX-YYYY-XXX)
  */
 export function projectCodeFormat(code: string): ValidateResult {
-  const regex = /^PRJ-\d{4}-\d{3}$/;
+  const regex = /^P00\d{5}-\d{4}-\d{3}$/;
   if (!regex.test(code)) {
-    return { valid: false, message: '项目编号格式不正确，应为 PRJ-YYYY-NNN' };
+    return { valid: false, message: '项目编号格式不正确，应为 P00XXXXX-YYYY-XXX' };
   }
   return { valid: true };
 }

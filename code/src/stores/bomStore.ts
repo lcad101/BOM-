@@ -51,7 +51,7 @@ export const useBomStore = defineStore('bom', () => {
     isLoading.value = true; error.value = null;
     try {
       const version = await safeInvoke<BomVersion>('create_bom_version', {
-        projectId: params.projectId, name: params.name,
+        projectId: params.projectId, bomCode: params.bomCode, name: params.name,
         versionNumber: params.versionNumber || 'v1.0', description: params.description || '',
         sourceVersionId: params.sourceVersionId || null, createdBy: params.createdBy,
       }, { successMessage: 'BOM版本创建成功' });

@@ -35,6 +35,8 @@ const commands: Record<string, (...args: any[]) => any> = {
   add_alternative_part: cmdAddAlternativePart,
   remove_alternative_part: cmdRemoveAlternativePart,
   export_bom_to_excel: cmdExportBom,
+  trigger_backup: cmdTriggerBackup,
+  restore_from_backup: cmdRestoreFromBackup,
 };
 
 export async function mockInvoke<T>(command: string, args?: Record<string, unknown>): Promise<T> {
@@ -128,19 +130,21 @@ function cmdDeleteProject(a: Record<string, unknown>): void {
 function cmdCreateBomVersion(a: Record<string, unknown>): BomVersion {
   const d = getData();
   const pid = a.projectId as string;
+  const bomCode = a.bomCode as string;
   const name = a.name as string;
   const ver = (a.versionNumber as string) || 'v1.0';
   const desc = (a.description as string) || '';
   const srcId = a.sourceVersionId as string | undefined;
   const createdBy = (a.createdBy as string) || 'admin';
 
-  if (d.bomVersions.some((v) => v.projectId === pid && v.name === name && v.versionNumber === ver)) {
-    throw new Error('同一项目下BOM名称+版本号已存在');
+  if (!bomCode) throw new Error('BOM编号不能为空');
+  if (d.bomVersions.some((v) => v.bomCode === bomCode)) {
+    throw new Error('BOM编号已存在');
   }
 
   const ts = now();
   const version: BomVersion = {
-    id: generateId(), projectId: pid, name, versionNumber: ver, status: 'draft',
+    id: generateId(), projectId: pid, bomCode, name, versionNumber: ver, status: 'draft',
     sourceVersionId: srcId || null, description: desc, createdBy,
     releasedAt: null, createdAt: ts, updatedAt: ts, nodeCount: 0,
   };
@@ -161,6 +165,13 @@ function cmdCreateBomVersion(a: Record<string, unknown>): BomVersion {
   return version;
 }
 
+function ensureBomCode(v: BomVersion): void {
+  if (!v.bomCode) {
+    v.bomCode = '000000000000';
+    flushData();
+  }
+}
+
 function cmdListBomVersions(a: Record<string, unknown>): BomVersion[] {
   const d = getData();
   const pid = a.projectId as string;
@@ -173,6 +184,7 @@ function cmdGetBomVersion(a: Record<string, unknown>): BomVersion {
   const d = getData();
   const v = d.bomVersions.find((x) => x.id === a.versionId);
   if (!v) throw new Error(`BOM版本 ${a.versionId} 不存在`);
+  ensureBomCode(v);
   return v;
 }
 
@@ -467,6 +479,16 @@ function cmdRemoveAlternativePart(a: Record<string, unknown>): void {
   const d = getData();
   d.alternativeParts = d.alternativeParts.filter((ap) => ap.id !== a.alternativeId);
   flushData();
+}
+
+function cmdTriggerBackup(): { backupPath: string; timestamp: string } {
+  const ts = now();
+  const backupPath = `backups/bom_master_backup_${ts.replace(/[: ]/g, '-').replace(/-/g, '')}.json`;
+  return { backupPath, timestamp: ts };
+}
+
+function cmdRestoreFromBackup(): { success: boolean; message: string } {
+  return { success: true, message: '恢复成功，数据已还原' };
 }
 
 function cmdExportBom(a: Record<string, unknown>): { filePath: string; totalRows: number; fileSize: number } {
